@@ -1,2 +1,4 @@
+Django==3.2.3
+djangorestframework==3.12.4
 flake8==6.0.0
 flake8-isort==6.0.0
