@@ -161,6 +161,7 @@ jobs:
 
   send_message:
     runs-on: ubuntu-latest
+    if: branches == main
     needs: deploy
     steps:
     - name: Send message
