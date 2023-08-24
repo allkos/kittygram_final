@@ -1,4 +1,4 @@
-name: Main Kittygram workflow
+name: Test Kittygram workflow
 
 on:
   push:
@@ -61,6 +61,7 @@ jobs:
         cd frontend/
         npm run test
 
+name: Main Kittygram workflow
 on:
   push:
     branches:
