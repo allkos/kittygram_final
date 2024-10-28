@@ -44,55 +44,105 @@ The docker-compose.yml file for local project deployment and the docker-compose.
 
 ## Running the Project in Development Mode
 
-Create a project directory named `kittygram` and navigate into it:
+Clone the repository and navigate to it in the command line:
 
 ```bash
-mkdir kittygram
-cd kittygram
-
-Copy (or create) the docker-compose.production.yml file in the project directory and start the project:
-
-sudo docker compose -f docker-compose.production.yml up
-
-This will download the images, create and start containers, and set up volumes and networking.
-
-Launching the Project from GitHub Source Code
-
-Clone the repository:
-
 git clone git@github.com/allkos/kittygram_final
+```
+Create and activate a virtual environment:
+```
+python3.9 -m venv venv
+```
+If you are using Linux/macOS:
+```
+source venv/bin/activate
+```
+If you are using Windows:
+```
+source venv/scripts/activate
+```
+Upgrade pip:
+```
+python3.9 -m pip install --upgrade pip
+```
+Install dependencies from requirements.txt:
+```
+pip install -r requirements.txt
+```
+Set the database credentials in the .env file, using .env.example as a reference:
+```
+POSTGRES_USER=username
+POSTGRES_PASSWORD=password
+POSTGRES_DB=database_name
+DB_HOST=host_name
+DB_PORT=5432
+SECRET_KEY=django_settings_secret_key
+ALLOWED_HOSTS=127.0.0.1, localhost
+```
+Start Docker Compose with the default configuration (docker-compose.yml):
 
-Start the project:
+Build the containers:
+```
+sudo docker compose up -d --build
+```
+Apply migrations:
+```
+sudo docker compose exec backend python manage.py migrate
+```
+Create a superuser:
+```
+sudo docker compose exec backend python manage.py createsuperuser
+```
+Collect static files:
+```
+sudo docker compose exec backend python manage.py collectstatic
+```
+Copy static files to /backend_static/static/ in the backend container:
+```
+sudo docker compose exec backend cp -r /app/collected_static/. /backend_static/static/
+```
+Go to 127.0.0.1:8000
 
-sudo docker compose -f docker-compose.yml up
+Request Examples
 
-After Launch: Migrations and Static Files
+Example GET request : View the list of achievements.
+GET .../api/achievements/
 
-After launching, run migrations and collect static files for the backend. Frontend static files are collected during container startup, and then the container stops.
+Example response:
+```
+[
+    {
+        "id": 1,
+        "achievement_name": "jump-jump"
+    },
+    {
+        "id": 2,
+        "achievement_name": "fights with reflection in the mirror"
+    }
+]
+```
 
-sudo docker compose -f [docker-compose-file-name.yml] exec backend python manage.py migrate
-sudo docker compose -f [docker-compose-file-name.yml] exec backend python manage.py collectstatic
-sudo docker compose -f [docker-compose-file-name.yml] exec backend cp -r /app/collected_static/. /static/static/
+Example POST request: Add a new cat.
+POST .../api/cats/
 
-The project will now be available at:
-
-http://localhost:9000/
-
-Environment Variables
-
-Below is an example of a .env file with environment variables needed to run the application:
-
-POSTGRES_DB=kittygram
-POSTGRES_USER=kittygram_user
-POSTGRES_PASSWORD=kittygram_password
-DB_NAME=kittygram
-DB_HOST=db
-DEBUG=False
-SECRET_KEY=django_secret_key_example
-
-Stopping the Containers
-
-Press Ctrl+C in the window where the project is running, or run the following command in another terminal window:
-
-sudo docker compose -f docker-compose.yml down
-
+Request body:
+```
+{
+    "name": "Judith",
+    "color": "#FF8C00",
+    "birth_year": 1987
+}
+```
+Example response:
+```
+{
+    "id": 7,
+    "name": "Judith",
+    "color": "darkorange",
+    "birth_year": 1987,
+    "achievements": [],
+    "owner": 2,
+    "age": 36,
+    "image": null
+}
+```
